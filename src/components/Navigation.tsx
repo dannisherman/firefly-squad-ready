@@ -1,5 +1,5 @@
 
-import { Shield, Calendar, Users, Bell, Settings, BarChart3, FileText, Activity, Heart, DollarSign, Hospital, Database, Zap } from "lucide-react";
+import { Shield, Calendar, Users, Bell, Settings, BarChart3, FileText, Activity, Heart, DollarSign, Hospital, Database, Zap, Droplets, History, PenTool } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface NavigationProps {
@@ -15,6 +15,9 @@ export const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
     { id: "reporting", label: "Analytics", icon: FileText },
     { id: "monitoring", label: "Live Monitor", icon: Activity },
     { id: "patients", label: "Patient Alerts", icon: Heart },
+    { id: "patient-history", label: "Patient History", icon: History },
+    { id: "hydrants", label: "Hydrant Management", icon: Droplets },
+    { id: "documentation", label: "Documentation AI", icon: PenTool },
     { id: "billing", label: "Billing", icon: DollarSign },
     { id: "hospital", label: "Hospital Hub", icon: Hospital },
     { id: "integration", label: "Data Integration", icon: Database },

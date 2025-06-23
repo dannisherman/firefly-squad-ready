@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Dashboard } from "@/components/Dashboard";
 import { ScheduleManager } from "@/components/ScheduleManager";
@@ -5,6 +6,9 @@ import { EmployeeManager } from "@/components/EmployeeManager";
 import { ReportingModule } from "@/components/ReportingModule";
 import { MonitoringTools } from "@/components/MonitoringTools";
 import { PatientAlertSystem } from "@/components/PatientAlertSystem";
+import { PatientHistory } from "@/components/PatientHistory";
+import { HydrantManagement } from "@/components/HydrantManagement";
+import { DocumentationGenerator } from "@/components/DocumentationGenerator";
 import { BillingManagement } from "@/components/BillingManagement";
 import { HospitalCommHub } from "@/components/HospitalCommHub";
 import { DataIntegrationHub } from "@/components/DataIntegrationHub";
@@ -31,6 +35,12 @@ const Index = () => {
         return <MonitoringTools />;
       case "patients":
         return <PatientAlertSystem />;
+      case "patient-history":
+        return <PatientHistory />;
+      case "hydrants":
+        return <HydrantManagement />;
+      case "documentation":
+        return <DocumentationGenerator />;
       case "billing":
         return <BillingManagement />;
       case "hospital":
