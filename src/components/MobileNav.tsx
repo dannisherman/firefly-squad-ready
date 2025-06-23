@@ -1,5 +1,5 @@
 
-import { Shield, Calendar, Users, Bell, Settings, BarChart3, Menu, X, FileText, Activity } from "lucide-react";
+import { Shield, Calendar, Users, Bell, Settings, BarChart3, Menu, X, FileText, Activity, Heart, DollarSign, Hospital, Database, Zap } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
@@ -17,6 +17,11 @@ export const MobileNav = ({ activeTab, onTabChange }: MobileNavProps) => {
     { id: "employees", label: "Personnel", icon: Users },
     { id: "reporting", label: "Analytics", icon: FileText },
     { id: "monitoring", label: "Live Monitor", icon: Activity },
+    { id: "patients", label: "Patient Alerts", icon: Heart },
+    { id: "billing", label: "Billing", icon: DollarSign },
+    { id: "hospital", label: "Hospital Hub", icon: Hospital },
+    { id: "integration", label: "Data Integration", icon: Database },
+    { id: "workflows", label: "Workflows", icon: Zap },
     { id: "alerts", label: "Alerts", icon: Bell },
     { id: "settings", label: "Settings", icon: Settings },
   ];
@@ -52,7 +57,7 @@ export const MobileNav = ({ activeTab, onTabChange }: MobileNavProps) => {
       {/* Mobile Menu */}
       <nav
         className={cn(
-          "fixed top-0 left-0 h-full w-64 bg-slate-800 transform transition-transform duration-300 z-50",
+          "fixed top-0 left-0 h-full w-64 bg-slate-800 transform transition-transform duration-300 z-50 overflow-y-auto",
           isOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >

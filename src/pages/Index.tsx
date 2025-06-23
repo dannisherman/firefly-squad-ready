@@ -5,6 +5,11 @@ import { ScheduleManager } from "@/components/ScheduleManager";
 import { EmployeeManager } from "@/components/EmployeeManager";
 import { ReportingModule } from "@/components/ReportingModule";
 import { MonitoringTools } from "@/components/MonitoringTools";
+import { PatientAlertSystem } from "@/components/PatientAlertSystem";
+import { BillingManagement } from "@/components/BillingManagement";
+import { HospitalCommHub } from "@/components/HospitalCommHub";
+import { DataIntegrationHub } from "@/components/DataIntegrationHub";
+import { AutomatedWorkflows } from "@/components/AutomatedWorkflows";
 import { Navigation } from "@/components/Navigation";
 import { MobileNav } from "@/components/MobileNav";
 import { AlertSystem } from "@/components/AlertSystem";
@@ -24,6 +29,16 @@ const Index = () => {
         return <ReportingModule />;
       case "monitoring":
         return <MonitoringTools />;
+      case "patients":
+        return <PatientAlertSystem />;
+      case "billing":
+        return <BillingManagement />;
+      case "hospital":
+        return <HospitalCommHub />;
+      case "integration":
+        return <DataIntegrationHub />;
+      case "workflows":
+        return <AutomatedWorkflows />;
       default:
         return <Dashboard />;
     }

@@ -1,5 +1,5 @@
 
-import { Shield, Calendar, Users, Bell, Settings, BarChart3, FileText, Activity } from "lucide-react";
+import { Shield, Calendar, Users, Bell, Settings, BarChart3, FileText, Activity, Heart, DollarSign, Hospital, Database, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface NavigationProps {
@@ -14,12 +14,17 @@ export const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
     { id: "employees", label: "Personnel", icon: Users },
     { id: "reporting", label: "Analytics", icon: FileText },
     { id: "monitoring", label: "Live Monitor", icon: Activity },
+    { id: "patients", label: "Patient Alerts", icon: Heart },
+    { id: "billing", label: "Billing", icon: DollarSign },
+    { id: "hospital", label: "Hospital Hub", icon: Hospital },
+    { id: "integration", label: "Data Integration", icon: Database },
+    { id: "workflows", label: "Workflows", icon: Zap },
     { id: "alerts", label: "Alerts", icon: Bell },
     { id: "settings", label: "Settings", icon: Settings },
   ];
 
   return (
-    <nav className="fixed left-0 top-0 h-full w-64 bg-slate-800/95 backdrop-blur-sm border-r border-slate-700 z-40">
+    <nav className="fixed left-0 top-0 h-full w-64 bg-slate-800/95 backdrop-blur-sm border-r border-slate-700 z-40 overflow-y-auto">
       <div className="p-6">
         <div className="flex items-center space-x-3 mb-8">
           <Shield className="h-8 w-8 text-red-500" />
