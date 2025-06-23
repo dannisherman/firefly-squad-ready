@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Dashboard } from "@/components/Dashboard";
 import { ScheduleManager } from "@/components/ScheduleManager";
@@ -10,6 +9,7 @@ import { BillingManagement } from "@/components/BillingManagement";
 import { HospitalCommHub } from "@/components/HospitalCommHub";
 import { DataIntegrationHub } from "@/components/DataIntegrationHub";
 import { AutomatedWorkflows } from "@/components/AutomatedWorkflows";
+import { Settings } from "@/components/Settings";
 import { Navigation } from "@/components/Navigation";
 import { MobileNav } from "@/components/MobileNav";
 import { AlertSystem } from "@/components/AlertSystem";
@@ -39,6 +39,8 @@ const Index = () => {
         return <DataIntegrationHub />;
       case "workflows":
         return <AutomatedWorkflows />;
+      case "settings":
+        return <Settings />;
       default:
         return <Dashboard />;
     }
