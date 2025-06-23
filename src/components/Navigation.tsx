@@ -1,6 +1,7 @@
 
 import { Shield, Calendar, Users, Bell, Settings, BarChart3, FileText, Activity, Heart, DollarSign, Hospital, Database, Zap, Droplets, History, PenTool } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useUserRole } from "@/hooks/useUserRole";
 
 interface NavigationProps {
   activeTab: string;
@@ -8,6 +9,8 @@ interface NavigationProps {
 }
 
 export const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
+  const { hasAccess } = useUserRole();
+
   const navItems = [
     { id: "dashboard", label: "Dashboard", icon: BarChart3 },
     { id: "schedule", label: "Scheduling", icon: Calendar },
@@ -24,7 +27,7 @@ export const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
     { id: "workflows", label: "Workflows", icon: Zap },
     { id: "alerts", label: "Alerts", icon: Bell },
     { id: "settings", label: "Settings", icon: Settings },
-  ];
+  ].filter(item => hasAccess(item.id));
 
   return (
     <nav className="fixed left-0 top-0 h-full w-64 bg-slate-800/95 backdrop-blur-sm border-r border-slate-700 z-40 overflow-y-auto">

@@ -2,6 +2,7 @@
 import { Shield, Calendar, Users, Bell, Settings, BarChart3, Menu, X, FileText, Activity, Heart, DollarSign, Hospital, Database, Zap, Droplets, History, PenTool } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { useUserRole } from "@/hooks/useUserRole";
 
 interface MobileNavProps {
   activeTab: string;
@@ -10,6 +11,7 @@ interface MobileNavProps {
 
 export const MobileNav = ({ activeTab, onTabChange }: MobileNavProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const { hasAccess } = useUserRole();
 
   const navItems = [
     { id: "dashboard", label: "Dashboard", icon: BarChart3 },
@@ -27,7 +29,7 @@ export const MobileNav = ({ activeTab, onTabChange }: MobileNavProps) => {
     { id: "workflows", label: "Workflows", icon: Zap },
     { id: "alerts", label: "Alerts", icon: Bell },
     { id: "settings", label: "Settings", icon: Settings },
-  ];
+  ].filter(item => hasAccess(item.id));
 
   const handleTabChange = (tab: string) => {
     onTabChange(tab);

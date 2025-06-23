@@ -1,184 +1,273 @@
 
 import { useState } from "react";
+import { Heart, AlertTriangle, Activity, Clock, Filter, Tag } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { AlertTriangle, User, Clock, MapPin, Heart, Phone, Camera, FileText } from "lucide-react";
-
-interface PatientAlert {
-  id: string;
-  patientName: string;
-  age: number;
-  condition: string;
-  severity: "Critical" | "High" | "Medium" | "Low";
-  location: string;
-  eta: string;
-  vitals: {
-    heartRate: number;
-    bloodPressure: string;
-    oxygenSat: number;
-  };
-  notes: string;
-  photos: number;
-  videos: number;
-  status: "En Route" | "At Scene" | "Transport" | "Arrived";
-}
+import { ExportUtils } from "./ExportUtils";
 
 export const PatientAlertSystem = () => {
-  const [alerts] = useState<PatientAlert[]>([
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [sortBy, setSortBy] = useState<"priority" | "time">("priority");
+
+  const alertTypes = ["cardiac", "trauma", "pediatrics", "respiratory", "overdose", "burn"];
+  
+  const patientAlerts = [
     {
-      id: "PA-001",
-      patientName: "John Smith",
-      age: 45,
-      condition: "Cardiac Arrest",
-      severity: "Critical",
-      location: "123 Main St",
-      eta: "8 minutes",
-      vitals: { heartRate: 45, bloodPressure: "90/60", oxygenSat: 88 },
-      notes: "Patient found unconscious, CPR in progress",
-      photos: 2,
-      videos: 1,
-      status: "Transport"
+      id: 1,
+      patientId: "P-2024-001",
+      priority: "critical",
+      tags: ["cardiac", "trauma"],
+      chief_complaint: "Chest pain with trauma",
+      vitals: {
+        bp: "180/110",
+        hr: 125,
+        rr: 22,
+        spo2: 94,
+        temp: "98.6°F",
+        glucose: 140
+      },
+      location: "1247 Oak Street",
+      timestamp: new Date(Date.now() - 10 * 60 * 1000),
+      assignedUnit: "Medic 7",
+      status: "en-route",
+      eta: "3 minutes"
     },
     {
-      id: "PA-002", 
-      patientName: "Sarah Johnson",
-      age: 32,
-      condition: "Motor Vehicle Accident",
-      severity: "High",
-      location: "Highway 101 & Oak St",
-      eta: "12 minutes",
-      vitals: { heartRate: 110, bloodPressure: "120/80", oxygenSat: 95 },
-      notes: "Possible head trauma, conscious and alert",
-      photos: 3,
-      videos: 0,
-      status: "En Route"
+      id: 2,
+      patientId: "P-2024-002", 
+      priority: "high",
+      tags: ["pediatrics", "respiratory"],
+      chief_complaint: "Pediatric respiratory distress",
+      vitals: {
+        bp: "90/60",
+        hr: 140,
+        rr: 35,
+        spo2: 89,
+        temp: "102.3°F",
+        glucose: null
+      },
+      location: "456 Maple Avenue",
+      timestamp: new Date(Date.now() - 25 * 60 * 1000),
+      assignedUnit: "Medic 3",
+      status: "on-scene",
+      eta: null
+    },
+    {
+      id: 3,
+      patientId: "P-2024-003",
+      priority: "moderate",
+      tags: ["overdose"],
+      chief_complaint: "Suspected opioid overdose",
+      vitals: {
+        bp: "110/70",
+        hr: 60,
+        rr: 8,
+        spo2: 85,
+        temp: "97.2°F", 
+        glucose: 95
+      },
+      location: "789 Pine Street",
+      timestamp: new Date(Date.now() - 45 * 60 * 1000),
+      assignedUnit: "Engine 12",
+      status: "transporting",
+      eta: "12 minutes to hospital"
     }
-  ]);
+  ];
 
-  const getSeverityColor = (severity: string) => {
-    switch (severity) {
-      case "Critical": return "bg-red-100 text-red-800 border-red-300";
-      case "High": return "bg-orange-100 text-orange-800 border-orange-300";
-      case "Medium": return "bg-yellow-100 text-yellow-800 border-yellow-300";
-      case "Low": return "bg-green-100 text-green-800 border-green-300";
-      default: return "bg-gray-100 text-gray-800 border-gray-300";
+  const filteredAlerts = patientAlerts.filter(alert => 
+    selectedTags.length === 0 || selectedTags.some(tag => alert.tags.includes(tag))
+  ).sort((a, b) => {
+    if (sortBy === "priority") {
+      const priorityOrder = { critical: 3, high: 2, moderate: 1 };
+      return (priorityOrder[b.priority as keyof typeof priorityOrder] || 0) - 
+             (priorityOrder[a.priority as keyof typeof priorityOrder] || 0);
+    }
+    return b.timestamp.getTime() - a.timestamp.getTime();
+  });
+
+  const toggleTag = (tag: string) => {
+    setSelectedTags(prev => 
+      prev.includes(tag) 
+        ? prev.filter(t => t !== tag)
+        : [...prev, tag]
+    );
+  };
+
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case "critical": return "bg-red-100 text-red-800 border-red-200";
+      case "high": return "bg-orange-100 text-orange-800 border-orange-200";
+      case "moderate": return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      default: return "bg-gray-100 text-gray-800 border-gray-200";
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "En Route": return "bg-blue-100 text-blue-800";
-      case "At Scene": return "bg-yellow-100 text-yellow-800";
-      case "Transport": return "bg-purple-100 text-purple-800";
-      case "Arrived": return "bg-green-100 text-green-800";
+      case "en-route": return "bg-blue-100 text-blue-800";
+      case "on-scene": return "bg-green-100 text-green-800";
+      case "transporting": return "bg-purple-100 text-purple-800";
       default: return "bg-gray-100 text-gray-800";
     }
   };
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-white mb-2">Patient Alert System</h1>
-        <p className="text-slate-300">Real-time patient information and hospital notifications</p>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
+        <div>
+          <h1 className="text-3xl font-bold text-white mb-2">Patient Alert System</h1>
+          <p className="text-slate-300">Critical alerts with pre-hospital vitals monitoring</p>
+        </div>
+        <div className="flex items-center space-x-3">
+          <Button
+            variant={sortBy === "priority" ? "default" : "outline"}
+            onClick={() => setSortBy("priority")}
+            className={sortBy === "priority" ? "bg-red-600 hover:bg-red-700" : "border-slate-600 text-slate-300 hover:bg-slate-700"}
+          >
+            Priority
+          </Button>
+          <Button
+            variant={sortBy === "time" ? "default" : "outline"}
+            onClick={() => setSortBy("time")}
+            className={sortBy === "time" ? "bg-red-600 hover:bg-red-700" : "border-slate-600 text-slate-300 hover:bg-slate-700"}
+          >
+            <Clock className="h-4 w-4 mr-2" />
+            Time
+          </Button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="bg-white/95 backdrop-blur-sm border-slate-200">
-          <CardContent className="p-6 text-center">
-            <AlertTriangle className="h-8 w-8 text-red-600 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-slate-900">2</p>
-            <p className="text-slate-600 text-sm">Active Alerts</p>
-          </CardContent>
-        </Card>
-        <Card className="bg-white/95 backdrop-blur-sm border-slate-200">
-          <CardContent className="p-6 text-center">
-            <Heart className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-slate-900">5</p>
-            <p className="text-slate-600 text-sm">Patients Today</p>
-          </CardContent>
-        </Card>
-        <Card className="bg-white/95 backdrop-blur-sm border-slate-200">
-          <CardContent className="p-6 text-center">
-            <Clock className="h-8 w-8 text-green-600 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-slate-900">3.2m</p>
-            <p className="text-slate-600 text-sm">Avg Notification Time</p>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Tag Filters */}
+      <Card className="bg-white/95 backdrop-blur-sm border-slate-200">
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <Tag className="h-5 w-5 mr-2" />
+            Filter by Alert Type
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-2">
+            {alertTypes.map(tag => (
+              <Button
+                key={tag}
+                size="sm"
+                variant={selectedTags.includes(tag) ? "default" : "outline"}
+                onClick={() => toggleTag(tag)}
+                className={selectedTags.includes(tag) ? "bg-red-600 hover:bg-red-700" : ""}
+              >
+                {tag}
+              </Button>
+            ))}
+            {selectedTags.length > 0 && (
+              <Button size="sm" variant="ghost" onClick={() => setSelectedTags([])}>
+                Clear All
+              </Button>
+            )}
+          </div>
+        </CardContent>
+      </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {alerts.map((alert) => (
-          <Card key={alert.id} className="bg-white/95 backdrop-blur-sm border-slate-200">
+      {/* Active Alerts */}
+      <div className="grid gap-6">
+        {filteredAlerts.map((alert) => (
+          <Card key={alert.id} className={`bg-white/95 backdrop-blur-sm border-l-4 ${
+            alert.priority === "critical" ? "border-l-red-500" :
+            alert.priority === "high" ? "border-l-orange-500" : "border-l-yellow-500"
+          }`}>
             <CardHeader>
               <div className="flex justify-between items-start">
-                <div>
-                  <CardTitle className="flex items-center space-x-2">
-                    <User className="h-5 w-5" />
-                    <span>{alert.patientName}, {alert.age}</span>
-                  </CardTitle>
-                  <p className="text-sm text-slate-600 mt-1">{alert.condition}</p>
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-3">
+                    <Badge className={getPriorityColor(alert.priority)}>
+                      {alert.priority.toUpperCase()}
+                    </Badge>
+                    <Badge className={getStatusColor(alert.status)}>
+                      {alert.status}
+                    </Badge>
+                    <span className="text-sm text-slate-600">
+                      {alert.assignedUnit} • {alert.patientId}
+                    </span>
+                  </div>
+                  <div className="flex space-x-2">
+                    {alert.tags.map(tag => (
+                      <Badge key={tag} variant="secondary" className="text-xs">
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
-                <div className="text-right space-y-2">
-                  <Badge className={getSeverityColor(alert.severity)}>
-                    {alert.severity}
-                  </Badge>
-                  <Badge className={getStatusColor(alert.status)}>
-                    {alert.status}
-                  </Badge>
+                <div className="text-right text-sm text-slate-600">
+                  <div>{alert.timestamp.toLocaleTimeString()}</div>
+                  {alert.eta && <div className="text-blue-600 font-medium">ETA: {alert.eta}</div>}
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center space-x-2">
-                  <MapPin className="h-4 w-4 text-slate-600" />
-                  <span className="text-sm">{alert.location}</span>
+            <CardContent>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div>
+                  <h4 className="font-semibold mb-2">Patient Information</h4>
+                  <div className="space-y-2 text-sm">
+                    <div><strong>Chief Complaint:</strong> {alert.chief_complaint}</div>
+                    <div><strong>Location:</strong> {alert.location}</div>
+                  </div>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <Clock className="h-4 w-4 text-slate-600" />
-                  <span className="text-sm">ETA: {alert.eta}</span>
-                </div>
-              </div>
-
-              <div className="bg-slate-50 p-3 rounded-lg">
-                <h4 className="font-medium text-sm mb-2">Vitals</h4>
-                <div className="grid grid-cols-3 gap-2 text-xs">
-                  <div>HR: {alert.vitals.heartRate}</div>
-                  <div>BP: {alert.vitals.bloodPressure}</div>
-                  <div>O2: {alert.vitals.oxygenSat}%</div>
-                </div>
-              </div>
-
-              <div>
-                <p className="text-sm text-slate-600">{alert.notes}</p>
-              </div>
-
-              <div className="flex justify-between items-center">
-                <div className="flex space-x-4 text-xs text-slate-600">
-                  <span className="flex items-center space-x-1">
-                    <Camera className="h-3 w-3" />
-                    <span>{alert.photos} photos</span>
-                  </span>
-                  <span className="flex items-center space-x-1">
-                    <FileText className="h-3 w-3" />
-                    <span>{alert.videos} videos</span>
-                  </span>
-                </div>
-                <div className="space-x-2">
-                  <Button size="sm" variant="outline">
-                    <Phone className="h-3 w-3 mr-1" />
-                    Call
-                  </Button>
-                  <Button size="sm">
-                    View Details
-                  </Button>
+                <div>
+                  <h4 className="font-semibold mb-2 flex items-center">
+                    <Activity className="h-4 w-4 mr-2" />
+                    Pre-Hospital Vitals
+                  </h4>
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div className="flex justify-between">
+                      <span>BP:</span>
+                      <span className={alert.vitals.bp && (alert.vitals.bp.startsWith("180") || alert.vitals.bp.startsWith("200")) ? "text-red-600 font-medium" : ""}>
+                        {alert.vitals.bp}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>HR:</span>
+                      <span className={alert.vitals.hr > 120 || alert.vitals.hr < 60 ? "text-red-600 font-medium" : ""}>
+                        {alert.vitals.hr} bpm
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>RR:</span>
+                      <span className={alert.vitals.rr > 30 || alert.vitals.rr < 10 ? "text-red-600 font-medium" : ""}>
+                        {alert.vitals.rr} /min
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>SpO2:</span>
+                      <span className={alert.vitals.spo2 < 90 ? "text-red-600 font-medium" : ""}>
+                        {alert.vitals.spo2}%
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Temp:</span>
+                      <span className={alert.vitals.temp && parseFloat(alert.vitals.temp) > 101 ? "text-red-600 font-medium" : ""}>
+                        {alert.vitals.temp}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Glucose:</span>
+                      <span>{alert.vitals.glucose ? `${alert.vitals.glucose} mg/dL` : "N/A"}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </CardContent>
           </Card>
         ))}
       </div>
+
+      <ExportUtils 
+        title="Patient Alerts"
+        data={filteredAlerts}
+        filters={{
+          incidentType: selectedTags.join(", "),
+          dateRange: "Current shift"
+        }}
+      />
     </div>
   );
 };

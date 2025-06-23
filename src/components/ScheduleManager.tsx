@@ -1,12 +1,16 @@
 
 import { useState } from "react";
-import { Calendar, Plus, Filter, Download, RefreshCw } from "lucide-react";
+import { Calendar, Plus, Filter, Download, RefreshCw, Users, Clock } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { ExportUtils } from "./ExportUtils";
 
 export const ScheduleManager = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [viewMode, setViewMode] = useState<"week" | "month">("week");
+  const [filterByShift, setFilterByShift] = useState<string>("all");
+  const [filterByStation, setFilterByStation] = useState<string>("all");
 
   const shifts = [
     {
@@ -14,7 +18,11 @@ export const ScheduleManager = () => {
       station: "Engine 1",
       date: "2024-06-24",
       time: "6:00 AM - 6:00 PM",
-      personnel: ["Smith, J.", "Davis, R.", "Wilson, K."],
+      personnel: [
+        { name: "Smith, J.", status: "on-duty", certifications: ["EMT-P", "FF-I"] },
+        { name: "Davis, R.", status: "on-duty", certifications: ["EMT-B", "FF-II"] },
+        { name: "Wilson, K.", status: "on-duty", certifications: ["EMT-I", "FF-I"] }
+      ],
       status: "Confirmed",
       overtime: false,
     },
@@ -23,7 +31,10 @@ export const ScheduleManager = () => {
       station: "Ladder 3",
       date: "2024-06-24",
       time: "6:00 PM - 6:00 AM",
-      personnel: ["Brown, M.", "Taylor, S."],
+      personnel: [
+        { name: "Brown, M.", status: "off-duty", certifications: ["EMT-P", "FF-I"] },
+        { name: "Taylor, S.", status: "on-duty", certifications: ["EMT-B", "FF-II"] }
+      ],
       status: "Needs Staff",
       overtime: true,
     },
@@ -32,18 +43,32 @@ export const ScheduleManager = () => {
       station: "Rescue 5",
       date: "2024-06-25",
       time: "8:00 AM - 8:00 PM",
-      personnel: ["Johnson, L.", "Anderson, P.", "Martinez, C."],
+      personnel: [
+        { name: "Johnson, L.", status: "on-duty", certifications: ["EMT-P", "FF-I", "HAZMAT"] },
+        { name: "Anderson, P.", status: "on-duty", certifications: ["EMT-I", "FF-II"] },
+        { name: "Martinez, C.", status: "on-duty", certifications: ["EMT-B", "FF-I"] }
+      ],
       status: "Confirmed",
       overtime: false,
     },
   ];
 
-  const timeSlots = [
-    "6:00 AM", "8:00 AM", "10:00 AM", "12:00 PM", 
-    "2:00 PM", "4:00 PM", "6:00 PM", "8:00 PM", "10:00 PM"
-  ];
-
   const stations = ["Engine 1", "Engine 2", "Ladder 3", "Rescue 5", "Battalion 1"];
+  const shiftTypes = ["Day", "Night", "Relief"];
+
+  const filteredShifts = shifts.filter(shift => {
+    if (filterByStation !== "all" && shift.station !== filterByStation) return false;
+    if (filterByShift !== "all" && !shift.time.toLowerCase().includes(filterByShift.toLowerCase())) return false;
+    return true;
+  });
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "on-duty": return "bg-green-100 text-green-800";
+      case "off-duty": return "bg-red-100 text-red-800";
+      default: return "bg-gray-100 text-gray-800";
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -69,6 +94,48 @@ export const ScheduleManager = () => {
         </div>
       </div>
 
+      {/* Filters */}
+      <Card className="bg-white/95 backdrop-blur-sm border-slate-200">
+        <CardHeader>
+          <CardTitle>Filters</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-2">Station</label>
+              <select 
+                value={filterByStation}
+                onChange={(e) => setFilterByStation(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md"
+              >
+                <option value="all">All Stations</option>
+                {stations.map(station => (
+                  <option key={station} value={station}>{station}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">Shift Type</label>
+              <select 
+                value={filterByShift}
+                onChange={(e) => setFilterByShift(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md"
+              >
+                <option value="all">All Shifts</option>
+                {shiftTypes.map(shift => (
+                  <option key={shift} value={shift}>{shift}</option>
+                ))}
+              </select>
+            </div>
+            <div className="flex items-end">
+              <Button onClick={() => { setFilterByStation("all"); setFilterByShift("all"); }}>
+                Clear Filters
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* View Controls */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
         <div className="flex space-x-2">
@@ -93,67 +160,41 @@ export const ScheduleManager = () => {
         </div>
       </div>
 
-      {/* Schedule Grid */}
-      <Card className="bg-white/95 backdrop-blur-sm border-slate-200">
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <span>Weekly Schedule</span>
-            <Button size="sm" variant="outline" className="border-slate-300">
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Refresh
-            </Button>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-slate-200">
-                  <th className="text-left p-3 font-semibold">Station/Unit</th>
-                  <th className="text-center p-3 font-semibold">Mon 24</th>
-                  <th className="text-center p-3 font-semibold">Tue 25</th>
-                  <th className="text-center p-3 font-semibold">Wed 26</th>
-                  <th className="text-center p-3 font-semibold">Thu 27</th>
-                  <th className="text-center p-3 font-semibold">Fri 28</th>
-                  <th className="text-center p-3 font-semibold">Sat 29</th>
-                  <th className="text-center p-3 font-semibold">Sun 30</th>
-                </tr>
-              </thead>
-              <tbody>
-                {stations.map((station, stationIdx) => (
-                  <tr key={stationIdx} className="border-b border-slate-100 hover:bg-slate-50">
-                    <td className="p-3 font-medium">{station}</td>
-                    {[...Array(7)].map((_, dayIdx) => (
-                      <td key={dayIdx} className="p-3 text-center">
-                        <div className="space-y-1">
-                          {/* Day Shift */}
-                          <div className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs cursor-pointer hover:bg-blue-200 transition-colors">
-                            Day: Smith, J.
-                          </div>
-                          {/* Night Shift */}
-                          <div className="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs cursor-pointer hover:bg-purple-200 transition-colors">
-                            Night: Brown, M.
-                          </div>
-                        </div>
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Personnel Status Overview */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <Card className="bg-white/95 backdrop-blur-sm border-slate-200">
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Users className="h-5 w-5 mr-2" />
+              On-Duty Personnel
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {filteredShifts.flatMap(shift => shift.personnel.filter(p => p.status === "on-duty")).map((person, idx) => (
+                <div key={idx} className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                  <div>
+                    <div className="font-medium">{person.name}</div>
+                    <div className="text-sm text-slate-600">
+                      {person.certifications.join(", ")}
+                    </div>
+                  </div>
+                  <Badge className={getStatusColor(person.status)}>
+                    {person.status}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
-      {/* Shift Details */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="bg-white/95 backdrop-blur-sm border-slate-200">
           <CardHeader>
             <CardTitle>Open Shifts</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {shifts.filter(shift => shift.status === "Needs Staff").map((shift) => (
+              {filteredShifts.filter(shift => shift.status === "Needs Staff").map((shift) => (
                 <div key={shift.id} className="p-4 border border-yellow-200 bg-yellow-50 rounded-lg">
                   <div className="flex justify-between items-start">
                     <div>
@@ -173,7 +214,10 @@ export const ScheduleManager = () => {
 
         <Card className="bg-white/95 backdrop-blur-sm border-slate-200">
           <CardHeader>
-            <CardTitle>Overtime Tracking</CardTitle>
+            <CardTitle className="flex items-center">
+              <Clock className="h-5 w-5 mr-2" />
+              Overtime Tracking
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
@@ -207,6 +251,16 @@ export const ScheduleManager = () => {
           </CardContent>
         </Card>
       </div>
+
+      <ExportUtils 
+        title="Schedule Management"
+        data={filteredShifts}
+        filters={{
+          shift: filterByShift !== "all" ? filterByShift : undefined,
+          station: filterByStation !== "all" ? filterByStation : undefined,
+          dateRange: "Current week"
+        }}
+      />
     </div>
   );
 };
