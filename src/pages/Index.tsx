@@ -3,6 +3,8 @@ import { useState } from "react";
 import { Dashboard } from "@/components/Dashboard";
 import { ScheduleManager } from "@/components/ScheduleManager";
 import { EmployeeManager } from "@/components/EmployeeManager";
+import { ReportingModule } from "@/components/ReportingModule";
+import { MonitoringTools } from "@/components/MonitoringTools";
 import { Navigation } from "@/components/Navigation";
 import { MobileNav } from "@/components/MobileNav";
 import { AlertSystem } from "@/components/AlertSystem";
@@ -18,6 +20,10 @@ const Index = () => {
         return <ScheduleManager />;
       case "employees":
         return <EmployeeManager />;
+      case "reporting":
+        return <ReportingModule />;
+      case "monitoring":
+        return <MonitoringTools />;
       default:
         return <Dashboard />;
     }
