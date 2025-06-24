@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Dashboard } from "@/components/Dashboard";
 import { ScheduleManager } from "@/components/ScheduleManager";
@@ -18,6 +17,7 @@ import { Navigation } from "@/components/Navigation";
 import { MobileNav } from "@/components/MobileNav";
 import { TopBar } from "@/components/TopBar";
 import { AlertSystem } from "@/components/AlertSystem";
+import { EmployeeCenter } from "@/components/EmployeeCenter";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -44,6 +44,8 @@ const Index = () => {
     switch (activeTab) {
       case "dashboard":
         return <Dashboard />;
+      case "employee-center":
+        return <EmployeeCenter />;
       case "schedule":
         return <ScheduleManager />;
       case "employees":

@@ -20,7 +20,7 @@ export const useUserRole = () => {
     const mockUserData = {
       role: "admin" as UserRole,
       permissions: [
-        "dashboard", "schedule", "employees", "reporting", "monitoring",
+        "dashboard", "employee-center", "schedule", "employees", "reporting", "monitoring",
         "patients", "patient-history", "hydrants", "documentation",
         "billing", "hospital", "integration", "workflows", "alerts", "settings"
       ]
@@ -35,9 +35,9 @@ export const useUserRole = () => {
 
   const getRoleBasedModules = () => {
     const roleModules = {
-      responder: ["dashboard", "monitoring", "patients", "patient-history", "alerts"],
-      admin: ["dashboard", "schedule", "employees", "reporting", "billing", "settings", "integration", "workflows"],
-      medic: ["dashboard", "patients", "hospital", "documentation", "patient-history", "monitoring"]
+      responder: ["dashboard", "employee-center", "monitoring", "patients", "patient-history", "alerts"],
+      admin: ["dashboard", "employee-center", "schedule", "employees", "reporting", "billing", "settings", "integration", "workflows"],
+      medic: ["dashboard", "employee-center", "patients", "hospital", "documentation", "patient-history", "monitoring"]
     };
     
     return roleModules[userRole.role] || [];
