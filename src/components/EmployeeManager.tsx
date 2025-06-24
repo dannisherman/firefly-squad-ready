@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { User, AlertTriangle, Calendar, Shield, FileText, Award, Syringe, Clock, Lock, Eye, Search, Filter } from "lucide-react";
+import { AddPersonnelForm } from "./AddPersonnelForm";
 
 interface Employee {
   id: string;
@@ -88,7 +88,7 @@ interface AuditLog {
 }
 
 export const EmployeeManager = () => {
-  const [employees] = useState<Employee[]>([
+  const [employees, setEmployees] = useState<Employee[]>([
     {
       id: "EMP-001",
       name: "John Smith",
@@ -210,6 +210,27 @@ export const EmployeeManager = () => {
     // In production, send to secure logging service
   };
 
+  const handleAddPersonnel = (personnelData: any) => {
+    const newEmployee: Employee = {
+      id: `EMP-${String(employees.length + 1).padStart(3, '0')}`,
+      name: `${personnelData.firstName} ${personnelData.lastName}`,
+      badge: personnelData.badgeNumber,
+      position: personnelData.position,
+      department: personnelData.department,
+      hireDate: personnelData.hireDate,
+      status: personnelData.status as "Active" | "Inactive" | "On Leave",
+      accessLevel: personnelData.accessLevel as "Basic" | "Supervisor" | "Admin",
+      certifications: [],
+      immunizations: [],
+      qualifications: [],
+      workHistory: [],
+      documents: []
+    };
+    
+    setEmployees([...employees, newEmployee]);
+    console.log("New personnel added:", newEmployee);
+  };
+
   const filteredEmployees = employees.filter(employee => {
     const matchesSearch = employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          employee.badge.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -252,9 +273,12 @@ export const EmployeeManager = () => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-white mb-2">Personnel Management</h1>
-        <p className="text-slate-300">Comprehensive employee records, certifications, and compliance tracking</p>
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold text-white mb-2">Personnel Management</h1>
+          <p className="text-slate-300">Comprehensive employee records, certifications, and compliance tracking</p>
+        </div>
+        <AddPersonnelForm onAddPersonnel={handleAddPersonnel} />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
