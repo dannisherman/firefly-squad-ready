@@ -1,6 +1,10 @@
 
 import { useState } from "react";
+import { Navigation } from "@/components/Navigation";
+import { MobileNav } from "@/components/MobileNav";
 import { Dashboard } from "@/components/Dashboard";
+import { EmployeeCenter } from "@/components/EmployeeCenter";
+import { ShiftLogging } from "@/components/ShiftLogging";
 import { ScheduleManager } from "@/components/ScheduleManager";
 import { EmployeeManager } from "@/components/EmployeeManager";
 import { AssetsInventory } from "@/components/AssetsInventory";
@@ -15,40 +19,32 @@ import { BillingManagement } from "@/components/BillingManagement";
 import { HospitalCommHub } from "@/components/HospitalCommHub";
 import { DataIntegrationHub } from "@/components/DataIntegrationHub";
 import { AutomatedWorkflows } from "@/components/AutomatedWorkflows";
-import { Settings } from "@/components/Settings";
-import { Navigation } from "@/components/Navigation";
-import { MobileNav } from "@/components/MobileNav";
-import { TopBar } from "@/components/TopBar";
 import { AlertSystem } from "@/components/AlertSystem";
-import { EmployeeCenter } from "@/components/EmployeeCenter";
+import { Settings } from "@/components/Settings";
+import { TopBar } from "@/components/TopBar";
+import { useUserRole } from "@/hooks/useUserRole";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
+  const { userRole } = useUserRole();
 
-  const handleSearch = (query: string) => {
-    console.log("Searching for:", query);
-    // TODO: Implement search functionality
+  const currentUser = {
+    id: "EMP-001",
+    name: "John Smith",
+    badge: "FF-101",
+    role: userRole,
+    station: "Engine 1",
+    shift: "A"
   };
 
-  const handleProfileClick = () => {
-    setActiveTab("settings");
-  };
-
-  const handleSettingsClick = () => {
-    setActiveTab("settings");
-  };
-
-  const handleSignOutClick = () => {
-    console.log("Signing out...");
-    // TODO: Implement sign out functionality
-  };
-
-  const renderActiveComponent = () => {
+  const renderContent = () => {
     switch (activeTab) {
       case "dashboard":
         return <Dashboard />;
       case "employee-center":
         return <EmployeeCenter />;
+      case "shift-logging":
+        return <ShiftLogging currentUser={currentUser} />;
       case "schedule":
         return <ScheduleManager />;
       case "employees":
@@ -77,6 +73,8 @@ const Index = () => {
         return <DataIntegrationHub />;
       case "workflows":
         return <AutomatedWorkflows />;
+      case "alerts":
+        return <AlertSystem />;
       case "settings":
         return <Settings />;
       default:
@@ -85,40 +83,22 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800">
-      <AlertSystem />
-      
-      {/* Desktop Layout */}
-      <div className="hidden md:block">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-red-900 to-slate-900">
+      {/* Desktop Navigation */}
+      <div className="hidden lg:block">
         <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
-        <div className="ml-64">
-          <TopBar
-            onSearch={handleSearch}
-            onProfileClick={handleProfileClick}
-            onSettingsClick={handleSettingsClick}
-            onSignOutClick={handleSignOutClick}
-          />
-          <main className="p-6">
-            <div className="max-w-7xl mx-auto">
-              {renderActiveComponent()}
-            </div>
-          </main>
-        </div>
       </div>
-      
-      {/* Mobile Layout */}
-      <div className="md:hidden">
-        <MobileNav
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-          onProfileClick={handleProfileClick}
-          onSettingsClick={handleSettingsClick}
-          onSignOutClick={handleSignOutClick}
-        />
-        <main className="p-4">
-          <div className="max-w-7xl mx-auto">
-            {renderActiveComponent()}
-          </div>
+
+      {/* Mobile Navigation */}
+      <div className="lg:hidden">
+        <MobileNav activeTab={activeTab} onTabChange={setActiveTab} />
+      </div>
+
+      {/* Main Content */}
+      <div className="lg:ml-64 min-h-screen">
+        <TopBar />
+        <main className="p-6">
+          {renderContent()}
         </main>
       </div>
     </div>

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 
 export type UserRole = "responder" | "admin" | "medic";
@@ -19,10 +20,10 @@ export const useUserRole = () => {
     const mockUserData = {
       role: "admin" as UserRole,
       permissions: [
-        "dashboard", "employee-center", "schedule", "employees", "assets", "reporting", "monitoring",
+        "dashboard", "employee-center", "shift-logging", "schedule", "employees", "assets", "reporting", "monitoring",
         "patients", "patient-history", "hydrants", "documentation", "itm-reports",
         "billing", "hospital", "integration", "workflows", "alerts", "settings",
-        "time-off", "payroll-reporting" // Added itm-reports permission
+        "time-off", "payroll-reporting"
       ]
     };
     
@@ -35,9 +36,9 @@ export const useUserRole = () => {
 
   const getRoleBasedModules = () => {
     const roleModules = {
-      responder: ["dashboard", "employee-center", "monitoring", "patients", "patient-history", "alerts", "time-off"],
-      admin: ["dashboard", "employee-center", "schedule", "employees", "assets", "reporting", "billing", "settings", "integration", "workflows", "time-off", "payroll-reporting", "itm-reports"],
-      medic: ["dashboard", "employee-center", "patients", "hospital", "documentation", "patient-history", "monitoring", "time-off"]
+      responder: ["dashboard", "employee-center", "shift-logging", "monitoring", "patients", "patient-history", "alerts", "time-off"],
+      admin: ["dashboard", "employee-center", "shift-logging", "schedule", "employees", "assets", "reporting", "billing", "settings", "integration", "workflows", "time-off", "payroll-reporting", "itm-reports"],
+      medic: ["dashboard", "employee-center", "shift-logging", "patients", "hospital", "documentation", "patient-history", "monitoring", "time-off"]
     };
     
     return roleModules[userRole.role] || [];
