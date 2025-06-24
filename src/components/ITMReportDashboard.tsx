@@ -351,7 +351,7 @@ export const ITMReportDashboard = () => {
             <TabsContent value="insights" className="space-y-4">
               <div className="text-center py-12">
                 <TrendingUp className="h-12 w-12 text-slate-400 mx-auto mb-4" />
-                <h3 className="text-lg font-sem"bk8j font-semibold text-white mb-2">Advanced Insights</h3>
+                <h3 className="text-lg font-semibold text-white mb-2">Advanced Insights</h3>
                 <p className="text-slate-400">Access building details and identify overdue system inspections</p>
               </div>
             </TabsContent>
