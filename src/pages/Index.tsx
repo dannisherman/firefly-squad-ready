@@ -16,10 +16,29 @@ import { AutomatedWorkflows } from "@/components/AutomatedWorkflows";
 import { Settings } from "@/components/Settings";
 import { Navigation } from "@/components/Navigation";
 import { MobileNav } from "@/components/MobileNav";
+import { TopBar } from "@/components/TopBar";
 import { AlertSystem } from "@/components/AlertSystem";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
+
+  const handleSearch = (query: string) => {
+    console.log("Searching for:", query);
+    // TODO: Implement search functionality
+  };
+
+  const handleProfileClick = () => {
+    setActiveTab("settings");
+  };
+
+  const handleSettingsClick = () => {
+    setActiveTab("settings");
+  };
+
+  const handleSignOutClick = () => {
+    console.log("Signing out...");
+    // TODO: Implement sign out functionality
+  };
 
   const renderActiveComponent = () => {
     switch (activeTab) {
@@ -60,22 +79,39 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800">
       <AlertSystem />
       
-      {/* Desktop Navigation */}
+      {/* Desktop Layout */}
       <div className="hidden md:block">
         <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
-      </div>
-      
-      {/* Mobile Navigation */}
-      <div className="md:hidden">
-        <MobileNav activeTab={activeTab} onTabChange={setActiveTab} />
-      </div>
-      
-      {/* Main Content */}
-      <main className="md:ml-64 p-4 md:p-6">
-        <div className="max-w-7xl mx-auto">
-          {renderActiveComponent()}
+        <div className="ml-64">
+          <TopBar
+            onSearch={handleSearch}
+            onProfileClick={handleProfileClick}
+            onSettingsClick={handleSettingsClick}
+            onSignOutClick={handleSignOutClick}
+          />
+          <main className="p-6">
+            <div className="max-w-7xl mx-auto">
+              {renderActiveComponent()}
+            </div>
+          </main>
         </div>
-      </main>
+      </div>
+      
+      {/* Mobile Layout */}
+      <div className="md:hidden">
+        <MobileNav
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          onProfileClick={handleProfileClick}
+          onSettingsClick={handleSettingsClick}
+          onSignOutClick={handleSignOutClick}
+        />
+        <main className="p-4">
+          <div className="max-w-7xl mx-auto">
+            {renderActiveComponent()}
+          </div>
+        </main>
+      </div>
     </div>
   );
 };

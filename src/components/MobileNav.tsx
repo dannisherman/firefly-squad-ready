@@ -3,13 +3,17 @@ import { Shield, Calendar, Users, Bell, Settings, BarChart3, Menu, X, FileText, 
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useUserRole } from "@/hooks/useUserRole";
+import { UserProfile } from "./UserProfile";
 
 interface MobileNavProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
+  onProfileClick?: () => void;
+  onSettingsClick?: () => void;
+  onSignOutClick?: () => void;
 }
 
-export const MobileNav = ({ activeTab, onTabChange }: MobileNavProps) => {
+export const MobileNav = ({ activeTab, onTabChange, onProfileClick, onSettingsClick, onSignOutClick }: MobileNavProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const { hasAccess } = useUserRole();
 
@@ -45,12 +49,19 @@ export const MobileNav = ({ activeTab, onTabChange }: MobileNavProps) => {
             <Shield className="h-6 w-6 text-red-500" />
             <h1 className="text-lg font-bold text-white">FireOps</h1>
           </div>
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="text-white p-2 hover:bg-slate-700 rounded-lg transition-colors"
-          >
-            {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </button>
+          <div className="flex items-center space-x-2">
+            <UserProfile
+              onProfileClick={onProfileClick}
+              onSettingsClick={onSettingsClick}
+              onSignOutClick={onSignOutClick}
+            />
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="text-white p-2 hover:bg-slate-700 rounded-lg transition-colors"
+            >
+              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
+          </div>
         </div>
       </header>
 
