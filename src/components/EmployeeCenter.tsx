@@ -1,21 +1,22 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, Clock, Users, Bell, DollarSign, CheckCircle, XCircle, User, CalendarDays, Timer, FileText } from "lucide-react";
+import { Calendar, Clock, Users, Bell, DollarSign, CheckCircle, XCircle, User, CalendarDays, Timer, FileText, Plane } from "lucide-react";
 import { ShiftCalendar } from "./ShiftCalendar";
 import { TimeTracker } from "./TimeTracker";
 import { TimecardManager } from "./TimecardManager";
 import { AccrualBank } from "./AccrualBank";
+import { TimeOffManager } from "./TimeOffManager";
+import { PayrollReporting } from "./PayrollReporting";
 
 export const EmployeeCenter = () => {
   const [currentUser] = useState({
     id: "EMP-001",
     name: "John Smith",
     badge: "FF-101",
-    role: "employee", // or "admin"
+    role: "admin", // Changed to admin to show all features
     station: "Engine 1",
     shift: "A"
   });
@@ -114,7 +115,7 @@ export const EmployeeCenter = () => {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
         <Card className="bg-white/95 backdrop-blur-sm border-slate-200">
           <CardContent className="p-6 text-center">
             <Clock className="h-8 w-8 text-blue-600 mx-auto mb-2" />
@@ -138,6 +139,13 @@ export const EmployeeCenter = () => {
         </Card>
         <Card className="bg-white/95 backdrop-blur-sm border-slate-200">
           <CardContent className="p-6 text-center">
+            <Plane className="h-8 w-8 text-purple-600 mx-auto mb-2" />
+            <p className="text-2xl font-bold text-slate-900">2</p>
+            <p className="text-slate-600 text-sm">Pending Requests</p>
+          </CardContent>
+        </Card>
+        <Card className="bg-white/95 backdrop-blur-sm border-slate-200">
+          <CardContent className="p-6 text-center">
             <Bell className="h-8 w-8 text-red-600 mx-auto mb-2" />
             <p className="text-2xl font-bold text-slate-900">{announcements.filter(a => !a.read).length}</p>
             <p className="text-slate-600 text-sm">New Announcements</p>
@@ -156,9 +164,17 @@ export const EmployeeCenter = () => {
           <TabsTrigger value="timecard" className="text-white data-[state=active]:bg-white data-[state=active]:text-slate-900">
             Timecard
           </TabsTrigger>
+          <TabsTrigger value="time-off" className="text-white data-[state=active]:bg-white data-[state=active]:text-slate-900">
+            Time Off
+          </TabsTrigger>
           <TabsTrigger value="accruals" className="text-white data-[state=active]:bg-white data-[state=active]:text-slate-900">
             Accrual Bank
           </TabsTrigger>
+          {currentUser.role === "admin" && (
+            <TabsTrigger value="payroll" className="text-white data-[state=active]:bg-white data-[state=active]:text-slate-900">
+              Payroll & FLSA
+            </TabsTrigger>
+          )}
         </TabsList>
 
         <TabsContent value="dashboard">
@@ -297,9 +313,19 @@ export const EmployeeCenter = () => {
           </div>
         </TabsContent>
 
+        <TabsContent value="time-off">
+          <TimeOffManager currentUser={currentUser} />
+        </TabsContent>
+
         <TabsContent value="accruals">
           <AccrualBank currentUser={currentUser} />
         </TabsContent>
+
+        {currentUser.role === "admin" && (
+          <TabsContent value="payroll">
+            <PayrollReporting />
+          </TabsContent>
+        )}
       </Tabs>
     </div>
   );

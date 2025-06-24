@@ -22,7 +22,8 @@ export const useUserRole = () => {
       permissions: [
         "dashboard", "employee-center", "schedule", "employees", "reporting", "monitoring",
         "patients", "patient-history", "hydrants", "documentation",
-        "billing", "hospital", "integration", "workflows", "alerts", "settings"
+        "billing", "hospital", "integration", "workflows", "alerts", "settings",
+        "time-off", "payroll-reporting" // Added new permissions
       ]
     };
     
@@ -35,9 +36,9 @@ export const useUserRole = () => {
 
   const getRoleBasedModules = () => {
     const roleModules = {
-      responder: ["dashboard", "employee-center", "monitoring", "patients", "patient-history", "alerts"],
-      admin: ["dashboard", "employee-center", "schedule", "employees", "reporting", "billing", "settings", "integration", "workflows"],
-      medic: ["dashboard", "employee-center", "patients", "hospital", "documentation", "patient-history", "monitoring"]
+      responder: ["dashboard", "employee-center", "monitoring", "patients", "patient-history", "alerts", "time-off"],
+      admin: ["dashboard", "employee-center", "schedule", "employees", "reporting", "billing", "settings", "integration", "workflows", "time-off", "payroll-reporting"],
+      medic: ["dashboard", "employee-center", "patients", "hospital", "documentation", "patient-history", "monitoring", "time-off"]
     };
     
     return roleModules[userRole.role] || [];
