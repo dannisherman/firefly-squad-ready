@@ -27,6 +27,7 @@ export const MobileNav = ({ activeTab, onTabChange, onProfileClick, onSettingsCl
     { id: "patient-history", label: "Patient History", icon: History },
     { id: "hydrants", label: "Hydrant Management", icon: Droplets },
     { id: "documentation", label: "Documentation AI", icon: PenTool },
+    { id: "itm-reports", label: "ITM Reports", icon: FileText },
     { id: "billing", label: "Billing", icon: DollarSign },
     { id: "hospital", label: "Hospital Hub", icon: Hospital },
     { id: "integration", label: "Data Integration", icon: Database },

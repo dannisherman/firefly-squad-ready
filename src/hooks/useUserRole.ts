@@ -20,9 +20,9 @@ export const useUserRole = () => {
       role: "admin" as UserRole,
       permissions: [
         "dashboard", "employee-center", "schedule", "employees", "assets", "reporting", "monitoring",
-        "patients", "patient-history", "hydrants", "documentation",
+        "patients", "patient-history", "hydrants", "documentation", "itm-reports",
         "billing", "hospital", "integration", "workflows", "alerts", "settings",
-        "time-off", "payroll-reporting" // Added assets permission
+        "time-off", "payroll-reporting" // Added itm-reports permission
       ]
     };
     
@@ -36,7 +36,7 @@ export const useUserRole = () => {
   const getRoleBasedModules = () => {
     const roleModules = {
       responder: ["dashboard", "employee-center", "monitoring", "patients", "patient-history", "alerts", "time-off"],
-      admin: ["dashboard", "employee-center", "schedule", "employees", "assets", "reporting", "billing", "settings", "integration", "workflows", "time-off", "payroll-reporting"],
+      admin: ["dashboard", "employee-center", "schedule", "employees", "assets", "reporting", "billing", "settings", "integration", "workflows", "time-off", "payroll-reporting", "itm-reports"],
       medic: ["dashboard", "employee-center", "patients", "hospital", "documentation", "patient-history", "monitoring", "time-off"]
     };
     

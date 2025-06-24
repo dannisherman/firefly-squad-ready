@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Dashboard } from "@/components/Dashboard";
 import { ScheduleManager } from "@/components/ScheduleManager";
@@ -9,6 +10,7 @@ import { PatientAlertSystem } from "@/components/PatientAlertSystem";
 import { PatientHistory } from "@/components/PatientHistory";
 import { HydrantManagement } from "@/components/HydrantManagement";
 import { DocumentationGenerator } from "@/components/DocumentationGenerator";
+import { ITMReportHub } from "@/components/ITMReportHub";
 import { BillingManagement } from "@/components/BillingManagement";
 import { HospitalCommHub } from "@/components/HospitalCommHub";
 import { DataIntegrationHub } from "@/components/DataIntegrationHub";
@@ -65,6 +67,8 @@ const Index = () => {
         return <HydrantManagement />;
       case "documentation":
         return <DocumentationGenerator />;
+      case "itm-reports":
+        return <ITMReportHub />;
       case "billing":
         return <BillingManagement />;
       case "hospital":
