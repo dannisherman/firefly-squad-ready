@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Dashboard } from "@/components/Dashboard";
 import { ScheduleManager } from "@/components/ScheduleManager";
 import { EmployeeManager } from "@/components/EmployeeManager";
+import { AssetsInventory } from "@/components/AssetsInventory";
 import { ReportingModule } from "@/components/ReportingModule";
 import { MonitoringTools } from "@/components/MonitoringTools";
 import { PatientAlertSystem } from "@/components/PatientAlertSystem";
@@ -50,6 +51,8 @@ const Index = () => {
         return <ScheduleManager />;
       case "employees":
         return <EmployeeManager />;
+      case "assets":
+        return <AssetsInventory />;
       case "reporting":
         return <ReportingModule />;
       case "monitoring":

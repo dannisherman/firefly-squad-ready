@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 
 export type UserRole = "responder" | "admin" | "medic";
@@ -20,10 +19,10 @@ export const useUserRole = () => {
     const mockUserData = {
       role: "admin" as UserRole,
       permissions: [
-        "dashboard", "employee-center", "schedule", "employees", "reporting", "monitoring",
+        "dashboard", "employee-center", "schedule", "employees", "assets", "reporting", "monitoring",
         "patients", "patient-history", "hydrants", "documentation",
         "billing", "hospital", "integration", "workflows", "alerts", "settings",
-        "time-off", "payroll-reporting" // Added new permissions
+        "time-off", "payroll-reporting" // Added assets permission
       ]
     };
     
@@ -37,7 +36,7 @@ export const useUserRole = () => {
   const getRoleBasedModules = () => {
     const roleModules = {
       responder: ["dashboard", "employee-center", "monitoring", "patients", "patient-history", "alerts", "time-off"],
-      admin: ["dashboard", "employee-center", "schedule", "employees", "reporting", "billing", "settings", "integration", "workflows", "time-off", "payroll-reporting"],
+      admin: ["dashboard", "employee-center", "schedule", "employees", "assets", "reporting", "billing", "settings", "integration", "workflows", "time-off", "payroll-reporting"],
       medic: ["dashboard", "employee-center", "patients", "hospital", "documentation", "patient-history", "monitoring", "time-off"]
     };
     

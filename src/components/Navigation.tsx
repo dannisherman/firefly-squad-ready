@@ -1,5 +1,4 @@
-
-import { Shield, Calendar, Users, Bell, Settings, BarChart3, FileText, Activity, Heart, DollarSign, Hospital, Database, Zap, Droplets, History, PenTool, UserCheck } from "lucide-react";
+import { Shield, Calendar, Users, Bell, Settings, BarChart3, FileText, Activity, Heart, DollarSign, Hospital, Database, Zap, Droplets, History, PenTool, UserCheck, Package } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUserRole } from "@/hooks/useUserRole";
 
@@ -16,6 +15,7 @@ export const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
     { id: "employee-center", label: "Employee Center", icon: UserCheck },
     { id: "schedule", label: "Scheduling", icon: Calendar },
     { id: "employees", label: "Personnel", icon: Users },
+    { id: "assets", label: "Assets & Inventory", icon: Package },
     { id: "reporting", label: "Analytics", icon: FileText },
     { id: "monitoring", label: "Live Monitor", icon: Activity },
     { id: "patients", label: "Patient Alerts", icon: Heart },
