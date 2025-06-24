@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useForm } from "react-hook-form";
 import { UserPlus, X } from "lucide-react";
 
@@ -15,6 +16,12 @@ interface PersonnelFormData {
   firstName: string;
   lastName: string;
   dateOfBirth: string;
+  race: string;
+  ethnicity: string;
+  gender: string;
+  maritalStatus: string;
+  socialSecurityNumber: string;
+  citizenship: string;
   address: string;
   city: string;
   state: string;
@@ -25,13 +32,23 @@ interface PersonnelFormData {
   emergencyPhone: string;
   badgeNumber: string;
   employeeId: string;
+  payrollId: string;
   position: string;
+  rank: string;
   department: string;
+  unit: string;
+  division: string;
+  district: string;
   station: string;
   shift: string;
+  group: string;
   hireDate: string;
+  employmentStatus: string;
   status: string;
   accessLevel: string;
+  emsProviderLevel: string;
+  iaffLocalNumber: string;
+  qualifiers: string[];
   certifications: string;
   immunizations: string;
   notes: string;
@@ -49,6 +66,12 @@ export const AddPersonnelForm = ({ onAddPersonnel }: AddPersonnelFormProps) => {
       firstName: "",
       lastName: "",
       dateOfBirth: "",
+      race: "",
+      ethnicity: "",
+      gender: "",
+      maritalStatus: "",
+      socialSecurityNumber: "",
+      citizenship: "",
       address: "",
       city: "",
       state: "",
@@ -59,13 +82,23 @@ export const AddPersonnelForm = ({ onAddPersonnel }: AddPersonnelFormProps) => {
       emergencyPhone: "",
       badgeNumber: "",
       employeeId: "",
+      payrollId: "",
       position: "",
+      rank: "",
       department: "",
+      unit: "",
+      division: "",
+      district: "",
       station: "",
       shift: "",
+      group: "",
       hireDate: "",
+      employmentStatus: "Full-time",
       status: "Active",
       accessLevel: "Basic",
+      emsProviderLevel: "",
+      iaffLocalNumber: "",
+      qualifiers: [],
       certifications: "",
       immunizations: "",
       notes: ""
@@ -78,6 +111,13 @@ export const AddPersonnelForm = ({ onAddPersonnel }: AddPersonnelFormProps) => {
     setIsOpen(false);
   };
 
+  const qualifierOptions = [
+    "Administration",
+    "Deputy Chief", 
+    "EMS Chief",
+    "Firefighter"
+  ];
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
@@ -86,7 +126,7 @@ export const AddPersonnelForm = ({ onAddPersonnel }: AddPersonnelFormProps) => {
           Add Personnel
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
             <UserPlus className="h-5 w-5" />
@@ -101,7 +141,7 @@ export const AddPersonnelForm = ({ onAddPersonnel }: AddPersonnelFormProps) => {
               <CardHeader>
                 <CardTitle className="text-lg">Personal Information</CardTitle>
               </CardHeader>
-              <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="firstName"
@@ -146,7 +186,144 @@ export const AddPersonnelForm = ({ onAddPersonnel }: AddPersonnelFormProps) => {
                     </FormItem>
                   )}
                 />
-                
+
+                <FormField
+                  control={form.control}
+                  name="race"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Race</FormLabel>
+                      <FormControl>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select race" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="american-indian">American Indian or Alaska Native</SelectItem>
+                            <SelectItem value="asian">Asian</SelectItem>
+                            <SelectItem value="black">Black or African American</SelectItem>
+                            <SelectItem value="hawaiian">Native Hawaiian or Other Pacific Islander</SelectItem>
+                            <SelectItem value="white">White</SelectItem>
+                            <SelectItem value="two-or-more">Two or More Races</SelectItem>
+                            <SelectItem value="prefer-not-to-say">Prefer Not to Say</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="ethnicity"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Ethnicity</FormLabel>
+                      <FormControl>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select ethnicity" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="hispanic">Hispanic or Latino</SelectItem>
+                            <SelectItem value="non-hispanic">Not Hispanic or Latino</SelectItem>
+                            <SelectItem value="prefer-not-to-say">Prefer Not to Say</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="gender"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Gender</FormLabel>
+                      <FormControl>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select gender" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="male">Male</SelectItem>
+                            <SelectItem value="female">Female</SelectItem>
+                            <SelectItem value="non-binary">Non-binary</SelectItem>
+                            <SelectItem value="prefer-not-to-say">Prefer Not to Say</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="maritalStatus"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Marital Status</FormLabel>
+                      <FormControl>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select status" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="single">Single</SelectItem>
+                            <SelectItem value="married">Married</SelectItem>
+                            <SelectItem value="divorced">Divorced</SelectItem>
+                            <SelectItem value="widowed">Widowed</SelectItem>
+                            <SelectItem value="separated">Separated</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="socialSecurityNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Social Security Number</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="XXX-XX-XXXX" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="citizenship"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Citizenship</FormLabel>
+                      <FormControl>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select citizenship" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="us-citizen">US Citizen</SelectItem>
+                            <SelectItem value="permanent-resident">Permanent Resident</SelectItem>
+                            <SelectItem value="work-visa">Work Visa</SelectItem>
+                            <SelectItem value="other">Other</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 <FormField
                   control={form.control}
                   name="phone"
@@ -298,7 +475,7 @@ export const AddPersonnelForm = ({ onAddPersonnel }: AddPersonnelFormProps) => {
               <CardHeader>
                 <CardTitle className="text-lg">Employment Information</CardTitle>
               </CardHeader>
-              <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="employeeId"
@@ -323,6 +500,20 @@ export const AddPersonnelForm = ({ onAddPersonnel }: AddPersonnelFormProps) => {
                       <FormLabel>Badge Number *</FormLabel>
                       <FormControl>
                         <Input {...field} placeholder="FF-101" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="payrollId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Payroll ID</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="PAY-001" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -356,6 +547,35 @@ export const AddPersonnelForm = ({ onAddPersonnel }: AddPersonnelFormProps) => {
                     </FormItem>
                   )}
                 />
+
+                <FormField
+                  control={form.control}
+                  name="rank"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Rank</FormLabel>
+                      <FormControl>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select rank" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Probationary">Probationary</SelectItem>
+                            <SelectItem value="Firefighter">Firefighter</SelectItem>
+                            <SelectItem value="Senior Firefighter">Senior Firefighter</SelectItem>
+                            <SelectItem value="Lieutenant">Lieutenant</SelectItem>
+                            <SelectItem value="Captain">Captain</SelectItem>
+                            <SelectItem value="Battalion Chief">Battalion Chief</SelectItem>
+                            <SelectItem value="Assistant Chief">Assistant Chief</SelectItem>
+                            <SelectItem value="Deputy Chief">Deputy Chief</SelectItem>
+                            <SelectItem value="Fire Chief">Fire Chief</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 
                 <FormField
                   control={form.control}
@@ -377,6 +597,59 @@ export const AddPersonnelForm = ({ onAddPersonnel }: AddPersonnelFormProps) => {
                             <SelectItem value="Prevention">Prevention</SelectItem>
                           </SelectContent>
                         </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="unit"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Unit</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="Engine 1, Ladder 2, etc." />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="division"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Division</FormLabel>
+                      <FormControl>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select division" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Operations">Operations</SelectItem>
+                            <SelectItem value="Support Services">Support Services</SelectItem>
+                            <SelectItem value="Fire Prevention">Fire Prevention</SelectItem>
+                            <SelectItem value="Training">Training</SelectItem>
+                            <SelectItem value="Administration">Administration</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="district"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>District</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="District 1, 2, etc." />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -435,6 +708,30 @@ export const AddPersonnelForm = ({ onAddPersonnel }: AddPersonnelFormProps) => {
                     </FormItem>
                   )}
                 />
+
+                <FormField
+                  control={form.control}
+                  name="group"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Group</FormLabel>
+                      <FormControl>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select group" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Alpha">Alpha</SelectItem>
+                            <SelectItem value="Bravo">Bravo</SelectItem>
+                            <SelectItem value="Charlie">Charlie</SelectItem>
+                            <SelectItem value="Delta">Delta</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 
                 <FormField
                   control={form.control}
@@ -445,6 +742,31 @@ export const AddPersonnelForm = ({ onAddPersonnel }: AddPersonnelFormProps) => {
                       <FormLabel>Hire Date *</FormLabel>
                       <FormControl>
                         <Input type="date" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="employmentStatus"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Employment Status</FormLabel>
+                      <FormControl>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select status" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Full-time">Full-time</SelectItem>
+                            <SelectItem value="Part-time">Part-time</SelectItem>
+                            <SelectItem value="Seasonal">Seasonal</SelectItem>
+                            <SelectItem value="Volunteer">Volunteer</SelectItem>
+                            <SelectItem value="Contract">Contract</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -466,6 +788,7 @@ export const AddPersonnelForm = ({ onAddPersonnel }: AddPersonnelFormProps) => {
                             <SelectItem value="Active">Active</SelectItem>
                             <SelectItem value="Inactive">Inactive</SelectItem>
                             <SelectItem value="On Leave">On Leave</SelectItem>
+                            <SelectItem value="Retired">Retired</SelectItem>
                           </SelectContent>
                         </Select>
                       </FormControl>
@@ -492,6 +815,99 @@ export const AddPersonnelForm = ({ onAddPersonnel }: AddPersonnelFormProps) => {
                           </SelectContent>
                         </Select>
                       </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="emsProviderLevel"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>EMS Provider Level</FormLabel>
+                      <FormControl>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select EMS level" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="None">None</SelectItem>
+                            <SelectItem value="First Aid/CPR">First Aid/CPR</SelectItem>
+                            <SelectItem value="EMR">EMR</SelectItem>
+                            <SelectItem value="EMT-Basic">EMT-Basic</SelectItem>
+                            <SelectItem value="EMT-Advanced">EMT-Advanced</SelectItem>
+                            <SelectItem value="EMT-Paramedic">EMT-Paramedic</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="iaffLocalNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>IAFF Local Number</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="Local 123" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </CardContent>
+            </Card>
+
+            {/* Qualifiers */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Qualifiers</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <FormField
+                  control={form.control}
+                  name="qualifiers"
+                  render={() => (
+                    <FormItem>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {qualifierOptions.map((qualifier) => (
+                          <FormField
+                            key={qualifier}
+                            control={form.control}
+                            name="qualifiers"
+                            render={({ field }) => {
+                              return (
+                                <FormItem
+                                  key={qualifier}
+                                  className="flex flex-row items-start space-x-3 space-y-0"
+                                >
+                                  <FormControl>
+                                    <Checkbox
+                                      checked={field.value?.includes(qualifier)}
+                                      onCheckedChange={(checked) => {
+                                        return checked
+                                          ? field.onChange([...field.value, qualifier])
+                                          : field.onChange(
+                                              field.value?.filter(
+                                                (value) => value !== qualifier
+                                              )
+                                            )
+                                      }}
+                                    />
+                                  </FormControl>
+                                  <FormLabel className="text-sm font-normal">
+                                    {qualifier}
+                                  </FormLabel>
+                                </FormItem>
+                              )
+                            }}
+                          />
+                        ))}
+                      </div>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -571,7 +987,7 @@ export const AddPersonnelForm = ({ onAddPersonnel }: AddPersonnelFormProps) => {
                 Cancel
               </Button>
               <Button type="submit" className="bg-red-600 hover:bg-red-700">
-                Add Personnel
+                Create/Add
               </Button>
             </div>
           </form>

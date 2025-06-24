@@ -1,389 +1,267 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { DollarSign, Download, FileText, Clock, AlertTriangle, TrendingUp } from "lucide-react";
-import { ExportUtils } from "./ExportUtils";
+import { 
+  DollarSign, Clock, Calendar, FileText, Download, AlertTriangle, 
+  TrendingUp, Users, Calculator, BarChart3, PieChart, Settings 
+} from "lucide-react";
+
+interface PayrollData {
+  employeeId: string;
+  name: string;
+  regularHours: number;
+  overtimeHours: number;
+  holidayHours: number;
+  sickHours: number;
+  vacationHours: number;
+  totalPay: number;
+  period: string;
+}
+
+interface FLSASettings {
+  cycleLength: number; // 1, 2, 3, or 4 weeks
+  overtimeThreshold: number;
+  autoCalculate: boolean;
+  includeHolidays: boolean;
+}
+
+interface ReportFilter {
+  shift?: string;
+  station?: string;
+  incidentType?: string;
+  dateRange?: string;
+  flsaCycle?: string;
+}
 
 export const PayrollReporting = () => {
+  const [flsaSettings, setFlsaSettings] = useState<FLSASettings>({
+    cycleLength: 2, // 2-week cycle default
+    overtimeThreshold: 80, // 80 hours for 2-week cycle
+    autoCalculate: true,
+    includeHolidays: true
+  });
+
+  const [reportFilters, setReportFilters] = useState<ReportFilter>({});
   const [selectedPeriod, setSelectedPeriod] = useState("current");
-  const [flsaCycle, setFlsaCycle] = useState("weekly");
 
-  const [flsaData] = useState([
+  const [payrollData] = useState<PayrollData[]>([
     {
-      employee: "Smith, John",
-      badge: "FF-101",
-      regularHours: 40.0,
-      overtimeHours: 8.5,
-      totalHours: 48.5,
-      overtimeRate: 1.5,
-      grossPay: 2280.00,
-      flsaWeek: "Week 25",
-      violations: []
-    },
-    {
-      employee: "Davis, Robert", 
-      badge: "FF-102",
-      regularHours: 40.0,
-      overtimeHours: 16.0,
-      totalHours: 56.0,
-      overtimeRate: 1.5,
-      grossPay: 2640.00,
-      flsaWeek: "Week 25",
-      violations: ["Excessive OT"]
-    },
-    {
-      employee: "Wilson, Kate",
-      badge: "EMT-201",
-      regularHours: 40.0,
-      overtimeHours: 4.0,
-      totalHours: 44.0,
-      overtimeRate: 1.5,
-      grossPay: 1980.00,
-      flsaWeek: "Week 25",
-      violations: []
+      employeeId: "EMP-001",
+      name: "John Smith",
+      regularHours: 80,
+      overtimeHours: 12,
+      holidayHours: 8,
+      sickHours: 0,
+      vacationHours: 8,
+      totalPay: 4250.00,
+      period: "2024-06-01 to 2024-06-14"
     }
   ]);
 
-  const [overtimeRules] = useState({
-    weeklyThreshold: 40,
-    dailyThreshold: null, // California would be 8
-    consecutiveHoursLimit: 16,
-    maxWeeklyHours: 60,
-    mandatoryRestHours: 8,
-    overtimeRate: 1.5,
-    doubleTimeRate: 2.0,
-    doubleTimeThreshold: 12
-  });
-
-  const [payrollSummary] = useState({
-    totalEmployees: 45,
-    totalRegularHours: 1800,
-    totalOvertimeHours: 285,
-    totalGrossPay: 98750.00,
-    averageOvertimePerEmployee: 6.3,
-    flsaViolations: 3,
-    payPeriod: "June 17-23, 2024"
-  });
-
-  const [cannedReports] = useState([
-    {
-      name: "Weekly FLSA Summary",
-      description: "Standard weekly overtime compliance report",
-      lastRun: "2024-06-23",
-      frequency: "Weekly"
-    },
-    {
-      name: "Monthly Payroll Export",
-      description: "Complete payroll data for external processing",
-      lastRun: "2024-06-01", 
-      frequency: "Monthly"
-    },
-    {
-      name: "Overtime Analysis",
-      description: "Detailed overtime patterns and cost analysis",
-      lastRun: "2024-06-20",
-      frequency: "Bi-weekly"
-    },
-    {
-      name: "NFIRS Integration Report",
-      description: "Scheduling data formatted for NFIRS reporting",
-      lastRun: "2024-06-15",
-      frequency: "Monthly"
-    }
-  ]);
-
-  const generatePayrollExport = (format: string) => {
-    console.log(`Generating payroll export in ${format} format`);
-    // Export logic would go here
+  const calculateOvertime = (regularHours: number, cycleLength: number): number => {
+    const threshold = cycleLength === 1 ? 40 : cycleLength === 2 ? 80 : cycleLength === 3 ? 120 : 160;
+    return Math.max(0, regularHours - threshold);
   };
 
-  const runCannedReport = (reportName: string) => {
-    console.log(`Running canned report: ${reportName}`);
-  };
+  const exportToCSV = (data: PayrollData[]) => {
+    const headers = ["Employee ID", "Name", "Regular Hours", "Overtime Hours", "Holiday Hours", "Sick Hours", "Vacation Hours", "Total Pay", "Period"];
+    const csvContent = [
+      headers.join(","),
+      ...data.map(row => [
+        row.employeeId,
+        row.name,
+        row.regularHours,
+        row.overtimeHours,
+        row.holidayHours,
+        row.sickHours,
+        row.vacationHours,
+        row.totalPay,
+        `"${row.period}"`
+      ].join(","))
+    ].join("\n");
 
-  const exportToPayrollProvider = (provider: string) => {
-    console.log(`Exporting to ${provider} payroll provider`);
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `payroll-report-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
+      <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold text-white mb-2">Payroll & FLSA Reporting</h2>
-          <p className="text-slate-300">Overtime management, FLSA compliance, and payroll exports</p>
+          <p className="text-slate-300">Automated overtime calculations and payroll exports</p>
         </div>
         <div className="flex space-x-2">
-          <Select value={flsaCycle} onValueChange={setFlsaCycle}>
-            <SelectTrigger className="w-40">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="weekly">Weekly FLSA</SelectItem>
-              <SelectItem value="biweekly">Bi-Weekly</SelectItem>
-              <SelectItem value="custom">Custom Cycle</SelectItem>
-            </SelectContent>
-          </Select>
+          <Button variant="outline" onClick={() => exportToCSV(payrollData)}>
+            <Download className="h-4 w-4 mr-2" />
+            Export CSV
+          </Button>
+          <Button>
+            <FileText className="h-4 w-4 mr-2" />
+            Generate Report
+          </Button>
         </div>
       </div>
 
-      {/* Summary Cards */}
+      {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card className="bg-white/95 backdrop-blur-sm border-slate-200">
           <CardContent className="p-6 text-center">
             <DollarSign className="h-8 w-8 text-green-600 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-slate-900">${payrollSummary.totalGrossPay.toLocaleString()}</p>
-            <p className="text-slate-600 text-sm">Total Gross Pay</p>
+            <p className="text-2xl font-bold text-slate-900">$127,450</p>
+            <p className="text-slate-600 text-sm">Total Payroll</p>
           </CardContent>
         </Card>
         <Card className="bg-white/95 backdrop-blur-sm border-slate-200">
           <CardContent className="p-6 text-center">
-            <Clock className="h-8 w-8 text-orange-600 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-slate-900">{payrollSummary.totalOvertimeHours}</p>
+            <Clock className="h-8 w-8 text-blue-600 mx-auto mb-2" />
+            <p className="text-2xl font-bold text-slate-900">342</p>
             <p className="text-slate-600 text-sm">Overtime Hours</p>
           </CardContent>
         </Card>
         <Card className="bg-white/95 backdrop-blur-sm border-slate-200">
           <CardContent className="p-6 text-center">
-            <TrendingUp className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-slate-900">{payrollSummary.averageOvertimePerEmployee}</p>
-            <p className="text-slate-600 text-sm">Avg OT/Employee</p>
+            <Users className="h-8 w-8 text-purple-600 mx-auto mb-2" />
+            <p className="text-2xl font-bold text-slate-900">45</p>
+            <p className="text-slate-600 text-sm">Active Employees</p>
           </CardContent>
         </Card>
         <Card className="bg-white/95 backdrop-blur-sm border-slate-200">
           <CardContent className="p-6 text-center">
-            <AlertTriangle className="h-8 w-8 text-red-600 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-slate-900">{payrollSummary.flsaViolations}</p>
+            <AlertTriangle className="h-8 w-8 text-orange-600 mx-auto mb-2" />
+            <p className="text-2xl font-bold text-slate-900">3</p>
             <p className="text-slate-600 text-sm">FLSA Violations</p>
           </CardContent>
         </Card>
       </div>
 
-      <Tabs defaultValue="flsa-report" className="space-y-4">
+      <Tabs defaultValue="flsa" className="space-y-4">
         <TabsList className="bg-white/10 backdrop-blur-sm">
-          <TabsTrigger value="flsa-report" className="text-white data-[state=active]:bg-white data-[state=active]:text-slate-900">
-            FLSA Report
-          </TabsTrigger>
-          <TabsTrigger value="overtime" className="text-white data-[state=active]:bg-white data-[state=active]:text-slate-900">
-            Overtime Rules
-          </TabsTrigger>
-          <TabsTrigger value="exports" className="text-white data-[state=active]:bg-white data-[state=active]:text-slate-900">
-            Payroll Exports
+          <TabsTrigger value="flsa" className="text-white data-[state=active]:bg-white data-[state=active]:text-slate-900">
+            FLSA Management
           </TabsTrigger>
           <TabsTrigger value="reports" className="text-white data-[state=active]:bg-white data-[state=active]:text-slate-900">
-            Canned Reports
+            Payroll Reports
+          </TabsTrigger>
+          <TabsTrigger value="exports" className="text-white data-[state=active]:bg-white data-[state=active]:text-slate-900">
+            Export Tools
+          </TabsTrigger>
+          <TabsTrigger value="analytics" className="text-white data-[state=active]:bg-white data-[state=active]:text-slate-900">
+            Analytics
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="flsa-report">
-          <Card className="bg-white/95 backdrop-blur-sm border-slate-200">
-            <CardHeader>
-              <CardTitle>FLSA Compliance Report - {payrollSummary.payPeriod}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Employee</TableHead>
-                    <TableHead>Badge</TableHead>
-                    <TableHead>Regular Hours</TableHead>
-                    <TableHead>Overtime Hours</TableHead>
-                    <TableHead>Total Hours</TableHead>
-                    <TableHead>Gross Pay</TableHead>
-                    <TableHead>Status</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {flsaData.map((employee, index) => (
-                    <TableRow key={index}>
-                      <TableCell className="font-medium">{employee.employee}</TableCell>
-                      <TableCell>{employee.badge}</TableCell>
-                      <TableCell>{employee.regularHours}</TableCell>
-                      <TableCell className="text-orange-600">{employee.overtimeHours}</TableCell>
-                      <TableCell>{employee.totalHours}</TableCell>
-                      <TableCell className="font-medium">${employee.grossPay.toLocaleString()}</TableCell>
-                      <TableCell>
-                        {employee.violations.length > 0 ? (
-                          <Badge className="bg-red-100 text-red-800">
-                            <AlertTriangle className="h-3 w-3 mr-1" />
-                            Violations
-                          </Badge>
-                        ) : (
-                          <Badge className="bg-green-100 text-green-800">Compliant</Badge>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="overtime">
-          <Card className="bg-white/95 backdrop-blur-sm border-slate-200">
-            <CardHeader>
-              <CardTitle>Overtime Rules & FLSA Settings</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <h4 className="font-semibold">Current Rules</h4>
-                  <div className="space-y-3 text-sm">
-                    <div className="flex justify-between p-3 bg-slate-50 rounded">
-                      <span>Weekly Overtime Threshold:</span>
-                      <span className="font-medium">{overtimeRules.weeklyThreshold} hours</span>
-                    </div>
-                    <div className="flex justify-between p-3 bg-slate-50 rounded">
-                      <span>Overtime Rate:</span>
-                      <span className="font-medium">{overtimeRules.overtimeRate}x</span>
-                    </div>
-                    <div className="flex justify-between p-3 bg-slate-50 rounded">
-                      <span>Double Time Rate:</span>
-                      <span className="font-medium">{overtimeRules.doubleTimeRate}x</span>
-                    </div>
-                    <div className="flex justify-between p-3 bg-slate-50 rounded">
-                      <span>Max Weekly Hours:</span>
-                      <span className="font-medium">{overtimeRules.maxWeeklyHours} hours</span>
-                    </div>
-                    <div className="flex justify-between p-3 bg-slate-50 rounded">
-                      <span>Mandatory Rest:</span>
-                      <span className="font-medium">{overtimeRules.mandatoryRestHours} hours</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  <h4 className="font-semibold">FLSA Cycle Configuration</h4>
-                  <div className="space-y-3">
-                    <div className="p-4 border rounded">
-                      <h5 className="font-medium mb-2">Current Cycle: {flsaCycle}</h5>
-                      <p className="text-sm text-slate-600">
-                        Automatically converts hours to overtime based on your FLSA cycle settings.
-                      </p>
-                      <Button size="sm" className="mt-2" variant="outline">
-                        Configure Cycle
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="exports">
+        <TabsContent value="flsa">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card className="bg-white/95 backdrop-blur-sm border-slate-200">
               <CardHeader>
-                <CardTitle>Payroll Provider Exports</CardTitle>
+                <CardTitle className="flex items-center space-x-2">
+                  <Settings className="h-5 w-5" />
+                  <span>FLSA Cycle Settings</span>
+                </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-2">
-                    <Button 
-                      onClick={() => exportToPayrollProvider("ADP")}
-                      variant="outline" 
-                      className="justify-start"
-                    >
-                      <FileText className="h-4 w-4 mr-2" />
-                      ADP Export
-                    </Button>
-                    <Button 
-                      onClick={() => exportToPayrollProvider("Paychex")}
-                      variant="outline"
-                      className="justify-start"
-                    >
-                      <FileText className="h-4 w-4 mr-2" />
-                      Paychex Export
-                    </Button>
-                    <Button 
-                      onClick={() => exportToPayrollProvider("QuickBooks")}
-                      variant="outline"
-                      className="justify-start"
-                    >
-                      <FileText className="h-4 w-4 mr-2" />
-                      QuickBooks
-                    </Button>
-                    <Button 
-                      onClick={() => exportToPayrollProvider("Generic")}
-                      variant="outline"
-                      className="justify-start"
-                    >
-                      <Download className="h-4 w-4 mr-2" />
-                      Generic CSV
-                    </Button>
-                  </div>
-                  <div className="pt-4 border-t">
-                    <h5 className="font-medium mb-2">Export Options</h5>
-                    <div className="space-y-2">
-                      <Button
-                        onClick={() => generatePayrollExport("detailed")}
-                        size="sm"
-                        variant="outline"
-                        className="w-full justify-start"
-                      >
-                        Detailed Payroll Report
-                      </Button>
-                      <Button
-                        onClick={() => generatePayrollExport("summary")}
-                        size="sm"
-                        variant="outline"
-                        className="w-full justify-start"
-                      >
-                        Summary Export
-                      </Button>
-                    </div>
-                  </div>
+              <CardContent className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium text-slate-700">Cycle Length</label>
+                  <Select value={flsaSettings.cycleLength.toString()} onValueChange={(value) => 
+                    setFlsaSettings({...flsaSettings, cycleLength: parseInt(value)})
+                  }>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">1 Week (40 hour threshold)</SelectItem>
+                      <SelectItem value="2">2 Weeks (80 hour threshold)</SelectItem>
+                      <SelectItem value="3">3 Weeks (120 hour threshold)</SelectItem>
+                      <SelectItem value="4">4 Weeks (160 hour threshold)</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
+
+                <div>
+                  <label className="text-sm font-medium text-slate-700">Overtime Threshold</label>
+                  <Input 
+                    type="number" 
+                    value={flsaSettings.overtimeThreshold}
+                    onChange={(e) => setFlsaSettings({...flsaSettings, overtimeThreshold: parseInt(e.target.value)})}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="flex items-center space-x-2">
+                    <input 
+                      type="checkbox" 
+                      checked={flsaSettings.autoCalculate}
+                      onChange={(e) => setFlsaSettings({...flsaSettings, autoCalculate: e.target.checked})}
+                    />
+                    <span className="text-sm">Auto-calculate overtime</span>
+                  </label>
+                  <label className="flex items-center space-x-2">
+                    <input 
+                      type="checkbox" 
+                      checked={flsaSettings.includeHolidays}
+                      onChange={(e) => setFlsaSettings({...flsaSettings, includeHolidays: e.target.checked})}
+                    />
+                    <span className="text-sm">Include holidays in calculations</span>
+                  </label>
+                </div>
+
+                <Button className="w-full">
+                  Save FLSA Settings
+                </Button>
               </CardContent>
             </Card>
 
             <Card className="bg-white/95 backdrop-blur-sm border-slate-200">
               <CardHeader>
-                <CardTitle>Integration Exports</CardTitle>
+                <CardTitle className="flex items-center space-x-2">
+                  <Calculator className="h-5 w-5" />
+                  <span>Overtime Calculator</span>
+                </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <p className="text-sm text-slate-600 mb-4">
-                    Export scheduling data to other systems for comprehensive reporting.
-                  </p>
-                  <div className="space-y-2">
-                    <Button
-                      onClick={() => generatePayrollExport("nfirs")}
-                      variant="outline"
-                      className="w-full justify-start"
-                    >
-                      <FileText className="h-4 w-4 mr-2" />
-                      NFIRS Integration
-                    </Button>
-                    <Button
-                      onClick={() => generatePayrollExport("epcr")}
-                      variant="outline"
-                      className="w-full justify-start"
-                    >
-                      <FileText className="h-4 w-4 mr-2" />
-                      ePCR System
-                    </Button>
-                    <Button
-                      onClick={() => generatePayrollExport("training")}
-                      variant="outline"
-                      className="w-full justify-start"
-                    >
-                      <FileText className="h-4 w-4 mr-2" />
-                      Training Records
-                    </Button>
-                    <Button
-                      onClick={() => generatePayrollExport("assets")}
-                      variant="outline"
-                      className="w-full justify-start"
-                    >
-                      <FileText className="h-4 w-4 mr-2" />
-                      Asset Management
-                    </Button>
+              <CardContent className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium text-slate-700">Regular Hours</label>
+                  <Input type="number" placeholder="Enter hours" />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-slate-700">FLSA Cycle</label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select cycle" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="current">Current Cycle</SelectItem>
+                      <SelectItem value="previous">Previous Cycle</SelectItem>
+                      <SelectItem value="custom">Custom Period</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Button className="w-full">Calculate Overtime</Button>
+                
+                <div className="mt-4 p-3 bg-slate-50 rounded-lg">
+                  <div className="flex justify-between text-sm">
+                    <span>Regular Pay:</span>
+                    <span className="font-medium">$2,400.00</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span>Overtime Pay:</span>
+                    <span className="font-medium">$540.00</span>
+                  </div>
+                  <div className="flex justify-between text-sm font-bold border-t pt-2 mt-2">
+                    <span>Total Pay:</span>
+                    <span>$2,940.00</span>
                   </div>
                 </div>
               </CardContent>
@@ -394,27 +272,49 @@ export const PayrollReporting = () => {
         <TabsContent value="reports">
           <Card className="bg-white/95 backdrop-blur-sm border-slate-200">
             <CardHeader>
-              <CardTitle>Canned & Ad Hoc Reports</CardTitle>
+              <CardTitle className="flex items-center space-x-2">
+                <FileText className="h-5 w-5" />
+                <span>Payroll Reports</span>
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {cannedReports.map((report, index) => (
-                  <div key={index} className="p-4 border rounded-lg">
+                {payrollData.map((employee) => (
+                  <div key={employee.employeeId} className="p-4 border rounded-lg">
                     <div className="flex justify-between items-start mb-2">
                       <div>
-                        <h4 className="font-semibold">{report.name}</h4>
-                        <p className="text-sm text-slate-600">{report.description}</p>
-                        <p className="text-xs text-slate-500 mt-1">
-                          Last run: {report.lastRun} • Frequency: {report.frequency}
-                        </p>
+                        <h4 className="font-medium">{employee.name}</h4>
+                        <p className="text-sm text-slate-600">ID: {employee.employeeId}</p>
+                        <p className="text-xs text-slate-500">{employee.period}</p>
                       </div>
-                      <Button
-                        size="sm"
-                        onClick={() => runCannedReport(report.name)}
-                        className="bg-blue-600 hover:bg-blue-700"
-                      >
-                        Run Report
-                      </Button>
+                      <div className="text-right">
+                        <p className="font-bold text-lg text-green-600">${employee.totalPay.toFixed(2)}</p>
+                        <Badge className="bg-blue-100 text-blue-800">
+                          {employee.overtimeHours}h OT
+                        </Badge>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-5 gap-2 text-xs">
+                      <div>
+                        <span className="text-slate-600">Regular:</span>
+                        <p className="font-medium">{employee.regularHours}h</p>
+                      </div>
+                      <div>
+                        <span className="text-slate-600">Overtime:</span>
+                        <p className="font-medium">{employee.overtimeHours}h</p>
+                      </div>
+                      <div>
+                        <span className="text-slate-600">Holiday:</span>
+                        <p className="font-medium">{employee.holidayHours}h</p>
+                      </div>
+                      <div>
+                        <span className="text-slate-600">Sick:</span>
+                        <p className="font-medium">{employee.sickHours}h</p>
+                      </div>
+                      <div>
+                        <span className="text-slate-600">Vacation:</span>
+                        <p className="font-medium">{employee.vacationHours}h</p>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -422,16 +322,94 @@ export const PayrollReporting = () => {
             </CardContent>
           </Card>
         </TabsContent>
-      </Tabs>
 
-      <ExportUtils
-        title="Payroll & FLSA Reporting"
-        data={flsaData}
-        filters={{
-          dateRange: payrollSummary.payPeriod,
-          flsaCycle: flsaCycle
-        }}
-      />
+        <TabsContent value="exports">
+          <Card className="bg-white/95 backdrop-blur-sm border-slate-200">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Download className="h-5 w-5" />
+                <span>Export Tools</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Button variant="outline" onClick={() => exportToCSV(payrollData)}>
+                  <FileText className="h-4 w-4 mr-2" />
+                  CSV Export
+                </Button>
+                <Button variant="outline">
+                  <FileText className="h-4 w-4 mr-2" />
+                  ADP Export
+                </Button>
+                <Button variant="outline">
+                  <FileText className="h-4 w-4 mr-2" />
+                  QuickBooks Export
+                </Button>
+              </div>
+              
+              <div className="p-4 bg-slate-50 rounded-lg">
+                <h4 className="font-medium mb-2">Export Filters</h4>
+                <div className="grid grid-cols-2 gap-2">
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="All Shifts" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Shifts</SelectItem>
+                      <SelectItem value="a">A Shift</SelectItem>
+                      <SelectItem value="b">B Shift</SelectItem>
+                      <SelectItem value="c">C Shift</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Date Range" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="current">Current Period</SelectItem>
+                      <SelectItem value="previous">Previous Period</SelectItem>
+                      <SelectItem value="ytd">Year to Date</SelectItem>
+                      <SelectItem value="custom">Custom Range</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="analytics">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card className="bg-white/95 backdrop-blur-sm border-slate-200">
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <BarChart3 className="h-5 w-5" />
+                  <span>Overtime Trends</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-64 flex items-center justify-center text-slate-500">
+                  Chart visualization would go here
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white/95 backdrop-blur-sm border-slate-200">
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <PieChart className="h-5 w-5" />
+                  <span>Cost Breakdown</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-64 flex items-center justify-center text-slate-500">
+                  Chart visualization would go here
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
